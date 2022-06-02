@@ -17,7 +17,7 @@ store.subscribe(() => {
 function App() {
   return (
     <VStack p={4}>
-      <Heading mb="8" fontWeight="bold" size="2xl">
+      <Heading mb="8" fontWeight="bold" size="2xl" color="pink.700">
         TODO APP
       </Heading>
       <Provider store={store}>
