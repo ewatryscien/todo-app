@@ -4,6 +4,11 @@ import { v1 as uuid } from "uuid";
 const storage = ({ dispatch, getState }) => (next) => (action) => {
   if (action.type !== actions.tasksStorage.type) return next(action);
 
+  if (action.payload.command === "load") {
+    const tasks = loadFromLocalStorage();
+    dispatch({ type: action.payload.onSuccess, payload: tasks });
+  }
+
   if (action.payload.command === "store") {
     const task = {
       id: uuid(),
@@ -16,14 +21,18 @@ const storage = ({ dispatch, getState }) => (next) => (action) => {
     dispatch({ type: action.payload.onSuccess, payload: task });
   }
 
-  if (action.payload.command === "load") {
+  if (action.payload.command === "update") {
     const tasks = loadFromLocalStorage();
-    dispatch({ type: action.payload.onSuccess, payload: tasks });
+    const task = action.payload.data;
+    console.log("updated task: ", task);
+    tasks[task.id] = task;
+
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    dispatch({ type: action.payload.onSuccess, payload: task });
   }
 
   if (action.payload.command === "delete") {
     const tasks = loadFromLocalStorage();
-    console.log("tasks.id:", action.payload.data);
     delete tasks[action.payload.data];
     localStorage.setItem("tasks", JSON.stringify(tasks));
     dispatch({ type: action.payload.onSuccess, payload: tasks });
