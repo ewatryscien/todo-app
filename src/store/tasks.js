@@ -13,28 +13,27 @@ const slice = createSlice({
       tasks.list.push(action.payload);
     },
 
-    taskCompleted: (tasks, action) => {
+    taskUpdated: (tasks, action) => {
       const index = tasks.list.findIndex(
         (task) => task.id === action.payload.id
       );
-      tasks.list[index].completed = true;
+      console.log("taskCompleted: ", action);
+      tasks.list[index] = action.payload;
     },
 
     taskDeleted: (tasks, action) => {
-      tasks.list = tasks.list.filter((task) => task.id !== action.payload.id);
-      console.log(tasks.list);
+      tasks.list = Object.values(action.payload);
     },
 
     tasksLoaded: (tasks, action) => {
       tasks.list = Object.values(action.payload);
-      console.log("These are: ", tasks.list);
     },
   },
 });
 
 export const {
   taskAdded,
-  taskCompleted,
+  taskUpdated,
   taskDeleted,
   tasksLoaded,
 } = slice.actions;
@@ -52,6 +51,20 @@ export const addTask = (task) =>
     command: "store",
     data: task,
     onSuccess: taskAdded.type,
+  });
+
+export const completeTask = (task) =>
+  tasksStorage({
+    command: "update",
+    data: { ...task, completed: true },
+    onSuccess: taskUpdated.type,
+  });
+
+export const incompleteTask = (task) =>
+  tasksStorage({
+    command: "update",
+    data: { ...task, completed: false },
+    onSuccess: taskUpdated.type,
   });
 
 export const deleteTask = (id) =>
