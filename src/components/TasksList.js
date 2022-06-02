@@ -1,6 +1,12 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { loadTasks, getAllTasks } from "../store/tasks";
+import {
+  loadTasks,
+  getAllTasks,
+  deleteTask,
+  completeTask,
+  incompleteTask,
+} from "../store/tasks";
 import {
   VStack,
   HStack,
@@ -13,11 +19,25 @@ import {
 
 const TasksList = () => {
   const dispatch = useDispatch();
+  const tasks = useSelector(getAllTasks);
 
   useEffect(() => {
     dispatch(loadTasks());
   }, []);
-  const tasks = useSelector(getAllTasks);
+
+  const handleDelete = (id) => {
+    dispatch(deleteTask(id));
+  };
+
+  const toggleCheck = (task, isChecked) => {
+    console.log("ischecked", isChecked);
+    if (isChecked) {
+      dispatch(completeTask(task));
+    } else {
+      dispatch(incompleteTask(task));
+    }
+    //setTasksToDisplay(tasks);
+  };
 
   return (
     <VStack
@@ -30,14 +50,22 @@ const TasksList = () => {
       maxW={{ base: "90vh", sm: "80vh", lg: "50vh" }}
       alignItems="stretch"
     >
-      {tasks.map((task) => (
-        <HStack key={task.id}>
-          <Checkbox mr="4"></Checkbox>
-          <Text>{task.description}</Text>
-          <Spacer />
-          <Button>Usuń</Button>
-        </HStack>
-      ))}
+      {tasks.length === 0 ? (
+        <Text alignSelf="center">Nie ma nic do zrobienia!</Text>
+      ) : (
+        tasks.map((task) => (
+          <HStack key={task.id}>
+            <Checkbox
+              mr="4"
+              onChange={(event) => toggleCheck(task, event.target.checked)}
+              isChecked={task.completed}
+            ></Checkbox>
+            <Text>{task.description}</Text>
+            <Spacer />
+            <Button onClick={() => handleDelete(task.id)}>Usuń</Button>}
+          </HStack>
+        ))
+      )}
     </VStack>
   );
 };
