@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   loadTasks,
@@ -6,8 +6,10 @@ import {
   deleteTask,
   completeTask,
   incompleteTask,
+  getIncompletedTasks,
 } from "../store/tasks";
 import {
+  Stack,
   VStack,
   HStack,
   Text,
@@ -16,10 +18,17 @@ import {
   Spacer,
   Checkbox,
 } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 
 const TasksList = () => {
   const dispatch = useDispatch();
-  const tasks = useSelector(getAllTasks);
+  const allTasks = useSelector(getAllTasks);
+  console.log("alltasks:", allTasks);
+  const incompleteTasks = useSelector(getIncompletedTasks);
+
+  const [showAllTasks, setShowAllTasks] = useState(true);
+
+  const tasks = showAllTasks ? allTasks : incompleteTasks;
 
   useEffect(() => {
     dispatch(loadTasks());
@@ -36,7 +45,10 @@ const TasksList = () => {
     } else {
       dispatch(incompleteTask(task));
     }
-    //setTasksToDisplay(tasks);
+  };
+
+  const handleHide = () => {
+    setShowAllTasks(!showAllTasks);
   };
 
   return (
@@ -45,9 +57,9 @@ const TasksList = () => {
       borderColor="gray.100"
       borderWidth="2px"
       p="4"
-      borderRadius="lg"
       w="100%"
-      maxW={{ base: "90vh", sm: "80vh", lg: "50vh" }}
+      maxW={{ base: "90vh", sm: "50vh", md: "60vh", lg: "80vh", xl: "90vh" }}
+      borderRadius="lg"
       alignItems="stretch"
     >
       {tasks.length === 0 ? (
@@ -60,12 +72,18 @@ const TasksList = () => {
               onChange={(event) => toggleCheck(task, event.target.checked)}
               isChecked={task.completed}
             ></Checkbox>
-            <Text>{task.description}</Text>
+            <Link to={`/task/${task.id}`}>
+              <Text as={task.completed ? "del" : ""}>{task.description}</Text>
+            </Link>
             <Spacer />
             <Button onClick={() => handleDelete(task.id)}>Usuń</Button>}
           </HStack>
         ))
       )}
+
+      <Button onClick={handleHide}>
+        {showAllTasks ? "Ukryj ukończone" : "Pokaż wszystkie zadania"}
+      </Button>
     </VStack>
   );
 };

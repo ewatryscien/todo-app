@@ -6,7 +6,6 @@ const slice = createSlice({
   name: "tasks",
   initialState: {
     list: [],
-    //loading: false,
   },
   reducers: {
     taskAdded: (tasks, action) => {
@@ -75,12 +74,18 @@ export const deleteTask = (id) =>
   });
 
 export const getAllTasks = createSelector(
+  //input
   (state) => {
-    console.log("state:", state);
+    //console.log("state:", state);
     return state;
-  }, //input
+  },
+  //output
   (tasks) => {
-    console.log("tasks:", tasks);
     return tasks.list;
   }
+);
+
+export const getIncompletedTasks = createSelector(
+  (state) => state,
+  (tasks) => tasks.list.filter((task) => !task.completed)
 );
